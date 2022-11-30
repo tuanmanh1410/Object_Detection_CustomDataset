@@ -157,6 +157,7 @@ def convert_to_coco_api(ds):
         img_dict["width"] = img.shape[-1]
         dataset["images"].append(img_dict)
         bboxes = targets["boxes"]
+        bboxes = bboxes.view(-1, 4) # Reshape BBoxes Tensor
         bboxes[:, 2:] -= bboxes[:, :2]
         bboxes = bboxes.tolist()
         labels = targets["labels"].tolist()
