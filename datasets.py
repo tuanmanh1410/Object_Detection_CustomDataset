@@ -138,6 +138,7 @@ class CustomDataset(Dataset):
             
         # Bounding box to tensor.
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        boxes = boxes.view(-1, 4) #Resize tensor avoid Index Error
         # Area of the bounding boxes.
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         # No crowd instances.
