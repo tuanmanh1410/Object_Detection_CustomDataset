@@ -4,6 +4,7 @@ import numpy as np
 import os
 import glob as glob
 import random
+import math
 
 from xml.etree import ElementTree as et
 from torch.utils.data import Dataset, DataLoader
@@ -109,17 +110,24 @@ class CustomDataset(Dataset):
             # Map the current object name to `classes` list to get
             # The label index and append to `labels` list.
             #labels.append(self.classes.index(member.find('state').text))
-            #labels.append(1)
-            labels.append(int(member.find('state').text))
-            
+            # labels.append(1)
+            if (int(member.find('state').text) > 7): # Get the valid bbox with label range 1-7
+                continue
+            else:
+                labels.append(int(member.find('state').text)) # For Multiple Classes
+
             # xmin = left corner x-coordinates
             xmin = float(member.find('x_min').text)
+            #xmin = math.floor(xmin)
             # xmax = right corner x-coordinates
             xmax = float(member.find('x_max').text)
+            #xmax = math.floor(xmax)
             # ymin = left corner y-coordinates
             ymin = float(member.find('y_min').text)
+            #ymin = math.floor(ymin)
             # ymax = right corner y-coordinates
             ymax = float(member.find('y_max').text)
+            #ymax = math.floor(ymax)
 
             ymax, xmax = self.check_image_and_annotation(
                 xmax, ymax, image_width, image_height
@@ -138,7 +146,8 @@ class CustomDataset(Dataset):
             
         # Bounding box to tensor.
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        boxes = boxes.view(-1, 4) #Resize tensor avoid Index Error
+        boxes = boxes.view(-1, 4)
+        #print(boxes.shape[1])
         # Area of the bounding boxes.
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         # No crowd instances.
