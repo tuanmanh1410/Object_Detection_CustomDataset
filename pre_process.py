@@ -1,3 +1,8 @@
+'''
+This script is used to filter out the images that have no bounding box(xml file)
+Split them into train/test set and list them in .csv file
+'''
+
 import os
 import csv
 from PIL import Image
