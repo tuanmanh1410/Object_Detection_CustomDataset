@@ -37,7 +37,7 @@ def parse_opt():
     )
     parser.add_argument(
         '-c', '--config', 
-        default='data_configs/egg.yaml',
+        default='data_configs/egg_binary.yaml',
         help='(optional) path to the data config file'
     )
     parser.add_argument(
@@ -132,7 +132,7 @@ def main(args):
         model.load_state_dict(checkpoint['model_state_dict'])
     model.to(DEVICE).eval()
     
-    coco_evaluator, stats, val_pred_image = evaluate(model, test_loader, device=DEVICE, save_valid_preds=False, out_dir=OUT_DIR, classes=CLASSES, colors=COLORS)
+    _, stats, _ = evaluate(model, test_loader, device = DEVICE, save_valid_preds = True, out_dir = OUT_DIR, classes = CLASSES, colors = COLORS)
     mAP = stats[0]
     print(f"mAP: {mAP}")
 
