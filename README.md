@@ -71,7 +71,7 @@ The `egg.yaml` is in the `data_configs` directory. Assuming, we store the egg da
 └── validate.py
 ```
 
-The content of the `egg.yaml` should be the following: (Just example, depend on your dataset) 
+The content of the `egg_mono.yaml` should be the following: (Just example, depend on your dataset) 
 
 ```yaml
 # Images and labels direcotry should be relative to train.py
@@ -84,11 +84,16 @@ VALID_DIR_LABELS: ../../xml_data/smoke_pascal_voc/archive/valid/annotations
 # Class names.
 CLASSES: [
     '__background__',
-    'egg'
+    'Normal',
+    'Blood Spot'
+    'Crack',
+    'Bleached'
+    'Impurity'
+    'Deformity'
 ]
 
 # Number of classes (object classes + 1 for background class in Faster RCNN).
-NC: 2
+NC: 7
 
 # Whether to save the predictions of the validation set while training.
 SAVE_VALID_PREDICTION_IMAGES: True
@@ -107,12 +112,12 @@ python train.py --config <path to the data config YAML file> --epochs 100 --mode
 **In this case, the exact command would be:**
 
 ```
-python train.py --config data_configs/egg.yaml --epochs 50 --model fasterrcnn_resnet50_fpn --project-name Egg_training --batch-size 8
+python train.py --config data_configs/egg_mono.yaml --epochs 50 --model fasterrcnn_resnet50_fpn --project-name Egg_Detection --batch-size 8
 ```
 
 ## Inference
 
-### Image Inference on COCO Pretrained Model
+### Image Inference on Pretrained Model
 
 By default using Faster RCNN ResNet50 FPN model.
 
@@ -131,6 +136,6 @@ python inference.py --model fasterrcnn_mobilenetv3_large_fpn --input example_tes
 In this case you only need to give the weights file path and input file path. The config file and the model name will be automatically inferred from the weights file.
 
 ```
-python inference.py --input data/inference_data/image_1.jpg --weights outputs/training/smoke_training/last_model_state.pth
+python inference.py --input data/inference_data/image_1.jpg --weights outputs/training/Egg_Detection/best_model.pth
 ```
 
