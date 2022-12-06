@@ -84,7 +84,9 @@ def main(args):
     NUM_CLASSES = data_configs['NC']
     CLASSES = data_configs['CLASSES']
     DEVICE = args['device']
-    COLORS = np.random.uniform(0, 255, size=(5, 3))
+    COLORS = np.random.uniform(0, 255, size=(6, 3)) # Depend the number of classes.
+    # Define the colors for each class with BGR format.
+    #COLORS = np.array([[220,220,220], [30,144,255], [151,255,255], [238,18,137], [180,238,180], [255,165,0], [191,62,255]])
     OUT_DIR = set_infer_dir()
     if args['input'] == None:
         DIR_TEST = data_configs['image_path']
@@ -121,6 +123,8 @@ def main(args):
         # Get the image file name for saving output later on.
         image_name = test_images[i].split(os.path.sep)[-1].split('.')[0]
         image = cv2.imread(test_images[i])
+        # Resize image
+        image = cv2.resize(image, (640, 640))
         orig_image = image.copy()
         # BGR to RGB
         image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
