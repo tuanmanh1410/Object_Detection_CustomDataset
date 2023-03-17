@@ -59,6 +59,7 @@ def create_model(num_classes, pretrained=True, coco_model=False):
     return model
 
 if __name__ == '__main__':
+    # Flexible num_classes depending on each custom datasets
     model = create_model(num_classes=3, pretrained=True, coco_model=True)
     print(model)
     # Total parameters and trainable parameters.
