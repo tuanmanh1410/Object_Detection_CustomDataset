@@ -5,6 +5,11 @@ The project refer to this **[repo](https://github.com/sovit-123/fasterrcnn-pytor
 Train PyTorch FasterRCNN models easily on any custom dataset. Choose between official PyTorch models trained on COCO dataset, or choose any backbone from Torchvision classification models, or even write your own custom backbones. 
 
 ***In my experimental results, I run with one GPU 2080 8GB with maximum batch size 8***.
+If you want to train Faster RCNN with multiple GPU,you can use this command 
+```
+python -m torch.distributed.launch --nproc_per_node=<Num of GPUs> --use_env train.py --config data_configs/egg_mono.yaml  --epochs 50 --model fasterrcnn_resnet50_fpn --project-name <Project Name> --batch-size 8
+```
+And replace some arguments which is appropriate with your system
 
 ## Get Started
 
