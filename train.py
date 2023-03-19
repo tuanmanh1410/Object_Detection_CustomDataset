@@ -5,8 +5,14 @@ python train.py --model fasterrcnn_resnet50_fpn --epochs 50 --config data_config
 """
 
 from torch_utils.engine import (
-    train_one_epoch, evaluate, valid_one_epoch
+    train_one_epoch, evaluate, valid_one_epoch, utils
 )
+from torch.utils.data import (
+    distributed, BatchSampler, RandomSampler, SequentialSampler
+)
+
+from torch.utils.data import DataLoader, DistributedSampler
+
 from datasets import (
     create_train_dataset, create_valid_dataset, 
     create_train_loader, create_valid_loader
@@ -33,11 +39,9 @@ import argparse
 import yaml
 import numpy as np
 import sys
+import random
 
-torch.multiprocessing.set_sharing_strategy('file_system')
-
-# For same annotation colors each time.
-np.random.seed(42)
+#torch.multiprocessing.set_sharing_strategy('file_system')
 
 def parse_opt():
     # Construct the argument parser.
@@ -52,9 +56,10 @@ def parse_opt():
     )
     parser.add_argument(
         '-d', '--device', 
-        default=torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'),
+        default=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
         help='computation/training device, default is GPU if GPU present'
     )
+    parser.add_argument('--seed', default=42, type=int)
     parser.add_argument(
         '-e', '--epochs', default=5, type=int,
         help='number of epochs to train for'
@@ -89,7 +94,7 @@ def parse_opt():
               that may make training difficult when used with mosaic'
     )
     parser.add_argument(
-        '-ca', '--cosine-annealing', dest='cosine_annealing', action='store_true',
+        '-ca', '--cosine-annealing', default=True, action='store_true',
         help='use cosine annealing warm restarts'
     )
     parser.add_argument(
@@ -106,10 +111,25 @@ def parse_opt():
         '-val', '--valid', dest='valid', default=False, type=bool,
         help='Flag to compute validation loss and plot'
     )
+
+    # distributed training parameters
+    parser.add_argument('--world_size', default=1, type=int,
+                        help='number of distributed processes')
+    parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
+
     args = vars(parser.parse_args())
     return args
 
 def main(args):
+    # Initialize distributed mode.
+    utils.init_distributed_mode(args)
+
+    # fix the seed for reproducibility
+    seed = args['seed'] + utils.get_rank()
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+
     # Load the data configurations
     with open(args['config']) as file:
         data_configs = yaml.safe_load(file)
@@ -122,7 +142,7 @@ def main(args):
     CLASSES = data_configs['CLASSES']
     NUM_CLASSES = data_configs['NC']
     NUM_WORKERS = args['workers']
-    DEVICE = args['device']
+    DEVICE = torch.device(args['device'])
     NUM_EPOCHS = args['epochs']
     SAVE_VALID_PREDICTIONS = data_configs['SAVE_VALID_PREDICTION_IMAGES']
     BATCH_SIZE = args['batch_size']
@@ -149,8 +169,25 @@ def main(args):
         VALID_DIR_IMAGES, VALID_DIR_LABELS, 
         IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
     )
-    train_loader = create_train_loader(train_dataset, BATCH_SIZE, NUM_WORKERS)
-    valid_loader = create_valid_loader(valid_dataset, BATCH_SIZE, NUM_WORKERS)
+
+    print('Creating data loaders')
+    if args['distributed']:
+        train_sampler = distributed.DistributedSampler(
+            train_dataset
+        )
+        valid_sampler = distributed.DistributedSampler(
+            valid_dataset, shuffle=False
+        )
+    else:
+        train_sampler = RandomSampler(train_dataset)
+        valid_sampler = SequentialSampler(valid_dataset)
+   
+    train_loader = create_train_loader(
+        train_dataset, BATCH_SIZE, NUM_WORKERS, batch_sampler=train_sampler
+    )
+    valid_loader = create_valid_loader(
+        valid_dataset, BATCH_SIZE, NUM_WORKERS, batch_sampler=valid_sampler
+    )
     print(f"Number of training samples: {len(train_dataset)}")
     print(f"Number of validation samples: {len(valid_dataset)}\n")
 
@@ -226,6 +263,12 @@ def main(args):
     # print(model)
     model = model.to(DEVICE)
 
+    model_without_ddp = model
+
+    if args['distributed']:
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args['gpu']])
+        model_without_ddp = model.module
+
     # Total parameters and trainable parameters.
     total_params = sum(p.numel() for p in model.parameters())
     print(f"{total_params:,} total parameters.")
@@ -241,7 +284,7 @@ def main(args):
         # LOAD THE OPTIMIZER STATE DICTIONARY FROM THE CHECKPOINT.
         print('Loading optimizer state dictionary...')
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-
+    '''
     if args['cosine_annealing']:
         # LR will be zero as we approach `steps` number of epochs each time.
         # If `steps = 5`, LR will slowly reduce to zero every 5 epochs.
@@ -252,9 +295,20 @@ def main(args):
             T_mult=1,
             verbose=False
         )
+    '''
+    # Define the learning rate scheduler.
+    if args['cosine_annealing']:
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, 
+            T_max=NUM_EPOCHS
+        )
     else:
-        scheduler = None
-
+        #scheduler = None
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, 
+            T_max=NUM_EPOCHS
+        )
+        
     save_best_model = SaveBestModel()
 
     for epoch in range(start_epochs, NUM_EPOCHS):
@@ -337,7 +391,7 @@ def main(args):
     
         save_model(
             epoch, 
-            model, 
+            model_without_ddp, 
             optimizer, 
             train_loss_list, 
             train_loss_list_epoch,
@@ -352,7 +406,7 @@ def main(args):
         # Save best model if the current mAP @0.5:0.95 IoU is
         # greater than the last hightest.
         save_best_model(
-            model, 
+            model_without_ddp, 
             val_map[-1], 
             epoch, 
             OUT_DIR,
@@ -363,5 +417,3 @@ def main(args):
 if __name__ == '__main__':
     args = parse_opt()
     main(args)
-    # Calculate the mAP on test dataset
-    # TO BE UPDATED.
