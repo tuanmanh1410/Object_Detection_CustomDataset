@@ -1,7 +1,10 @@
 """
-USAGE
+USAGE for multiple GPUs
 Training on ResNet50 FPN with custom project folder name and visualizing transformed images before training begins:
-python train.py --model fasterrcnn_resnet50_fpn --epochs 50 --config data_configs/egg.yaml --project-name Egg_Detection --batch-size 8
+
+python -m torch.distributed.launch --nproc_per_node=<Num of GPUs> --use_env train.py --config data_configs/egg_mono.yaml
+--epochs 50 --model fasterrcnn_resnet50_fpn --project-name <Project Name> --batch-size 8
+
 """
 
 from torch_utils.engine import (
