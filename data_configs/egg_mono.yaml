@@ -1,24 +1,25 @@
 # YAML Config file for the egg_mono dataset containing 6 classes
+# Data path should be absoluted directory
 
 # Images and labels direcotry should be relative to train.py
-TRAIN_DIR_IMAGES: ./data/Color_Dataset/train
-TRAIN_DIR_LABELS: ./data/Color_Dataset/train
+TRAIN_DIR_IMAGES: /hdd/ttmanh/Final_Egg/data_final/MONO_VOC/train
+TRAIN_DIR_LABELS: /hdd/ttmanh/Final_Egg/data_final/MONO_VOC/train
 
 # VALID_DIR should be relative to train.py
-VALID_DIR_IMAGES: ./data/Color_Dataset/val
-VALID_DIR_LABELS: ./data/Color_Dataset/val
+VALID_DIR_IMAGES: /hdd/ttmanh/Final_Egg/data_final/MONO_VOC/val
+VALID_DIR_LABELS: /hdd/ttmanh/Final_Egg/data_final/MONO_VOC/val
 
 # TEST_DIR should be relative to train.py
-TEST_DIR_IMAGES: ./data/Color_Dataset/test
-TEST_DIR_LABELS: ./data/Color_Dataset/test
+TEST_DIR_IMAGES: /hdd/ttmanh/Final_Egg/data_final/MONO_VOC/test
+TEST_DIR_LABELS: /hdd/ttmanh/Final_Egg/data_final/MONO_VOC/test
 
 # Class names.
 
 CLASSES: [
     '__background__',
     'Normal',
-    'Blood Spot',
     'Crack',
+    'Blood Spot',
     'Bleached',
     'Impurity',
     'Deformity'
