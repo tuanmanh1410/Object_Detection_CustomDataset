@@ -110,12 +110,12 @@ class CustomDataset(Dataset):
             # Map the current object name to `classes` list to get
             # The label index and append to `labels` list.
             #labels.append(self.classes.index(member.find('state').text))
-            # labels.append(1)
-            if (int(member.find('state').text) > 7): # Get the valid bbox with label range 1-7
+            #labels.append(1)
+            if (int(member.find('state').text) > 6):
                 continue
             else:
                 labels.append(int(member.find('state').text)) # For Multiple Classes
-
+            
             # xmin = left corner x-coordinates
             xmin = float(member.find('x_min').text)
             #xmin = math.floor(xmin)
@@ -316,21 +316,23 @@ def create_valid_dataset(
     )
     return valid_dataset
 
-def create_train_loader(train_dataset, batch_size, num_workers=0):
+def create_train_loader(train_dataset, batch_size, num_workers=0, batch_sampler=None):
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
-        shuffle=True,
+        #shuffle=True,
         num_workers=num_workers,
-        collate_fn=collate_fn
+        collate_fn=collate_fn,
+        sampler = batch_sampler
     )
     return train_loader
-def create_valid_loader(valid_dataset, batch_size, num_workers=0):
+def create_valid_loader(valid_dataset, batch_size, num_workers=0, batch_sampler=None):
     valid_loader = DataLoader(
         valid_dataset,
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        collate_fn=collate_fn
+        collate_fn=collate_fn,
+        sampler = batch_sampler
     )
     return valid_loader
