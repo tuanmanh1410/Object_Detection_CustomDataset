@@ -1,6 +1,6 @@
 # A Detection Faster RCNN PyTorch implementation for detecting object with custom dataset
 
-The project refer to this **[repo](https://github.com/sovit-123/fasterrcnn-pytorch-training-pipeline#Train-on-Custom-Dataset)**
+The project refer to **[FasterRCNN Pytorch Training Pipeline](https://github.com/sovit-123/fasterrcnn-pytorch-training-pipeline#Train-on-Custom-Dataset)**
 
 Train PyTorch FasterRCNN models easily on any custom dataset. Choose between official PyTorch models trained on COCO dataset, or choose any backbone from Torchvision classification models, or even write your own custom backbones. 
 
@@ -31,10 +31,16 @@ Train PyTorch FasterRCNN models easily on any custom dataset. Choose between off
       Please install the version with CUDA support as per your choice from Pytorch GetStarted **[here](https://pytorch.org/get-started/locally/)**.
 
       Then install the remaining requirements file.
+   
+   3. **Method 3**(Recommended): If your machine already had anaconda , you can using virtual_env.yml file to create env.
+
+      ```
+      conda env create -f virtual_env.yml
+      ```
 
 ## Train on Custom Dataset
 
-The `egg.yaml` is in the `data_configs` directory. Assuming, we store the egg data in the `data` directory
+The `egg_mono.yaml` is in the `data_configs` directory. Assuming, we store the egg data in the `data` directory
 
 ```
 ├── data
@@ -44,7 +50,8 @@ The `egg.yaml` is in the `data_configs` directory. Assuming, we store the egg da
 │   │   └── test
 │   └── README.md
 ├── data_configs
-│   └── egg.yaml
+│   |── egg_mono.yaml
+|   ...
 ├── models
 │   ├── create_fasterrcnn_model.py
 │   ...
@@ -71,7 +78,7 @@ The `egg.yaml` is in the `data_configs` directory. Assuming, we store the egg da
 └── validate.py
 ```
 
-The content of the `egg_mono.yaml` should be the following: (Just example, depend on your dataset) 
+The content of the `egg_mono.yaml` should be the following: (Just example, depend on your dataset. The data path should be absoluted) 
 
 ```yaml
 # Images and labels direcotry should be relative to train.py
