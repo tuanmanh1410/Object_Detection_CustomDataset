@@ -6,12 +6,6 @@ Train PyTorch FasterRCNN models easily on any custom dataset. Choose between off
 
 ***In my experimental results, I run with one GPU 2080 8GB with maximum batch size 8. You can change the batch size value which be appropriate with your GPU***.
 
-If you want to train Faster RCNN with multiple GPU,you can use this command:
-```
-python -m torch.distributed.launch --nproc_per_node=<Num of GPUs> --use_env train.py --config data_configs/egg_mono.yaml  --epochs 50 --model fasterrcnn_resnet50_fpn --project-name <Project Name> --batch-size 8
-```
-And replace some arguments which is appropriate with your system
-
 ## Get Started
 
 
@@ -113,13 +107,13 @@ Next, to start the training, you can use the following command.
 **Command format:**
 
 ```
-python train.py --config <path to the data config YAML file> --epochs 100 --model <model name (defaults to fasterrcnn_resnet50)> --project-name <folder name inside output/training/> --batch-size 16
+python -m torch.distributed.launch --nproc_per_node=<Num of GPUs> --use_env train.py --config <path to the data config YAML file>  --epochs 50 --model <model name (defaults to fasterrcnn_resnet50)> --project-name <Project Name> --batch-size <num of batch size>
 ```
 
 **In this case, the exact command would be:**
 
 ```
-python train.py --config data_configs/egg_mono.yaml --epochs 50 --model fasterrcnn_resnet50_fpn --project-name Egg_Detection --batch-size 8
+python -m torch.distributed.launch --nproc_per_node=4 --use_env train.py --config data_configs/egg_mono.yaml  --epochs 50 --model fasterrcnn_resnet50_fpn --project-name Egg_FasterRCNN --batch-size 8
 ```
 
 ## Inference
