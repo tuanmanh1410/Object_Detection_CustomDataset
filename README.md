@@ -32,7 +32,7 @@ Train PyTorch FasterRCNN models easily on any custom dataset. Choose between off
 
       Then install the remaining requirements file.
    
-   3. **Method 3**(Recommended): If your machine already had anaconda , you can using virtual_env.yml file to create env.
+   3. **Method 3**(Recommended): If your machine already had anaconda , you can using ***virtual_env.yml*** file to create env. CUDA version in this file is 11.7, this project can be run with CUDA 11.3 and later.
 
       ```
       conda env create -f virtual_env.yml
