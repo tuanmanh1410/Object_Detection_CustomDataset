@@ -1,16 +1,16 @@
 # YAML Config file for the egg_mono dataset containing 6 classes
 
 # Images and labels direcotry should be relative to train.py
-TRAIN_DIR_IMAGES: ./data/Color_Dataset/train
-TRAIN_DIR_LABELS: ./data/Color_Dataset/train
+TRAIN_DIR_IMAGES: /data/ttmanh/Egg_FasterRCNN_MultilpleGPU/data/MONO_VOC/train
+TRAIN_DIR_LABELS: /data/ttmanh/Egg_FasterRCNN_MultilpleGPU/data/MONO_VOC/train
 
 # VALID_DIR should be relative to train.py
-VALID_DIR_IMAGES: ./data/Color_Dataset/val
-VALID_DIR_LABELS: ./data/Color_Dataset/val
+VALID_DIR_IMAGES: /data/ttmanh/Egg_FasterRCNN_MultilpleGPU/data/MONO_VOC/val
+VALID_DIR_LABELS: /data/ttmanh/Egg_FasterRCNN_MultilpleGPU/data/MONO_VOC/val
 
 # TEST_DIR should be relative to train.py
-TEST_DIR_IMAGES: ./data/Color_Dataset/test
-TEST_DIR_LABELS: ./data/Color_Dataset/test
+TEST_DIR_IMAGES: /data/ttmanh/Egg_FasterRCNN_MultilpleGPU/data/MONO_VOC/test
+TEST_DIR_LABELS: /data/ttmanh/Egg_FasterRCNN_MultilpleGPU/data/MONO_VOC/test
 
 # Class names.
 
