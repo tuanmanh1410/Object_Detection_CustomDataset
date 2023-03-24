@@ -1,11 +1,12 @@
 # A Detection Faster RCNN PyTorch implementation for detecting object with custom dataset
 
-The project refer to this **[repo](https://github.com/sovit-123/fasterrcnn-pytorch-training-pipeline#Train-on-Custom-Dataset)**
+The project refer to this **[FasterRCNN Pytorch Training Pipeline](https://github.com/sovit-123/fasterrcnn-pytorch-training-pipeline#Train-on-Custom-Dataset)**
 
 Train PyTorch FasterRCNN models easily on any custom dataset. Choose between official PyTorch models trained on COCO dataset, or choose any backbone from Torchvision classification models, or even write your own custom backbones. 
 
-***In my experimental results, I run with one GPU 2080 8GB with maximum batch size 8***.
-If you want to train Faster RCNN with multiple GPU,you can use this command 
+***In my experimental results, I run with one GPU 2080 8GB with maximum batch size 8. You can change the batch size value which be appropriate with your GPU***.
+
+If you want to train Faster RCNN with multiple GPU,you can use this command:
 ```
 python -m torch.distributed.launch --nproc_per_node=<Num of GPUs> --use_env train.py --config data_configs/egg_mono.yaml  --epochs 50 --model fasterrcnn_resnet50_fpn --project-name <Project Name> --batch-size 8
 ```
@@ -39,7 +40,7 @@ And replace some arguments which is appropriate with your system
 
 ## Train on Custom Dataset
 
-The `egg.yaml` is in the `data_configs` directory. Assuming, we store the egg data in the `data` directory
+The `egg_mono.yaml` is in the `data_configs` directory. Assuming, we store the egg data in the `data` directory
 
 ```
 ├── data
@@ -49,7 +50,8 @@ The `egg.yaml` is in the `data_configs` directory. Assuming, we store the egg da
 │   │   └── test
 │   └── README.md
 ├── data_configs
-│   └── egg.yaml
+│   |── egg_mono.yaml
+|   ...
 ├── models
 │   ├── create_fasterrcnn_model.py
 │   ...
@@ -76,7 +78,7 @@ The `egg.yaml` is in the `data_configs` directory. Assuming, we store the egg da
 └── validate.py
 ```
 
-The content of the `egg_mono.yaml` should be the following: (Just example, depend on your dataset) 
+The content of the `egg_mono.yaml` should be the following: (Just example, depend on your dataset and data path should be absoluted path) 
 
 ```yaml
 # Images and labels direcotry should be relative to train.py
@@ -90,8 +92,8 @@ VALID_DIR_LABELS: ../../xml_data/smoke_pascal_voc/archive/valid/annotations
 CLASSES: [
     '__background__',
     'Normal',
-    'Blood Spot'
     'Crack',
+    'Blood Spot'
     'Bleached'
     'Impurity'
     'Deformity'
